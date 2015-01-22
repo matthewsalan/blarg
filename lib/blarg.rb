@@ -3,7 +3,7 @@ require 'pry'
 require 'camping'
 
 # NOTE: BLOG_REPO has to end with a slash/.
-BLOG_REPO = '/Users/brit/projects/improvedmeans/'
+BLOG_REPO = '/Users/alanmatthews/tiy-ror/homework/brit_blog/improvedmeans/'
 
 Camping.goes :Blarg
 
@@ -186,6 +186,29 @@ class BlogApp
     end
   end
 end
+
+  def top_tags
+    result = {}
+    Blarg::Models::Post.find_each do |p|
+      result[p.tags] = 0
+      Blarg::Models::Post.where(:tags => p.id).each do |g|
+        result[p.tags] += 1 if g.finished
+      end
+    end
+    result.sort_by{ |k, v| -v }.each { |k, v| puts "'#{k}': #{v}" }
+    puts result
+  end
+
+  def top_months
+    top_months = {}
+    Blarg::Models::Post.find_each do |p|
+      top_months[p.date] = 0
+      Blarg::Models::Post.where(:date => p.id).each do |g|
+        top_months[p.date] += 1 if g.finished
+      end
+    end
+    top_months.sort_by {|key, value| puts key}
+   end
 
 def Blarg.create
   Blarg::Models.create_schema
