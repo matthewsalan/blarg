@@ -188,7 +188,7 @@ class BlogApp
 end
 
   def top_tags
-    result = {}
+    result = Hash.new(0)
     Blarg::Models::Post.find_each do |p|
       result[p.tags] = 0
       Blarg::Models::Post.where(:tags => p.id).each do |g|
@@ -200,15 +200,13 @@ end
   end
 
   def top_months
-    top_months = {}
-    Blarg::Models::Post.find_each do |p|
-      top_months[p.date] = 0
-      Blarg::Models::Post.where(:date => p.id).each do |g|
-        top_months[p.date] += 1 if g.finished
-      end
+    sqlite_month = "strftime('%Y-%m', date)"
+    grouped = Blarg::Models::Post.select(sqlite_month).group(sqlite_month)
+    ordered = grouped.count.sort_by { |k, v| -v }.to_h
+    ordered.first(n).each do |m, posts|
+      puts "Blogged #{posts} times in #{m}"
     end
-    top_months.sort_by {|key, value| puts key}
-   end
+  end
 
 def Blarg.create
   Blarg::Models.create_schema
